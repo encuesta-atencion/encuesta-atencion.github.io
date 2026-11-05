@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#BF0909">
+<title>Encuesta sobre Calidad de Atención</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --r800:#BF0909; --r700:#DC362E; --r200:#FCEEEE; --r300:#F9DEDC;
+    --surface:#fff; --surface-2:#F3F4F6; --text:#26292E; --muted:#6B7280; --border:#E5E7EB; --border-strong:#9CA3AF;
+    --focus:#1A56DB; --ok:#1A7F37; --sel:#BF0909; --sel-text:#fff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --surface:#1E2126; --surface-2:#14171A; --text:#ECEDEE; --muted:#A7ADB5; --border:#343A42; --border-strong:#4A515A;
+            --focus:#8AB4F8; --ok:#3FB950; --r200:#3a1c1c; --r300:#4a2323; --sel:#C8362F; }
+  }
+  html.alto-contraste { --surface:#000; --surface-2:#000; --text:#fff; --muted:#fff; --border:#fff; --border-strong:#fff; --sel:#FFD147; --sel-text:#000; --r800:#FFD147; --r200:#000; --r300:#000; --focus:#FFD147; }
+  html.letra-grande { font-size: 20px; }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { font-size: 17px; -webkit-text-size-adjust: 100%; }
+  body { margin:0; font-family:'Public Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background:var(--surface-2); color:var(--text); line-height:1.45; }
+  .franja { height:6px; background:var(--r800); }
+  header { background:var(--surface); border-bottom:1px solid var(--border); }
+  .hwrap { max-width:760px; margin:0 auto; padding:0.85rem 1rem; display:flex; gap:0.75rem; align-items:center; justify-content:space-between; }
+  .hent { font-weight:800; font-size:1rem; line-height:1.25; }
+  .hsede { color:var(--muted); font-size:0.85rem; }
+  .htools { display:flex; gap:0.35rem; flex-shrink:0; }
+  .htools button { border:1px solid var(--border-strong); background:var(--surface); color:var(--text); border-radius:8px; min-width:44px; min-height:40px; font:inherit; font-weight:700; font-size:0.85rem; cursor:pointer; }
+  main { max-width:760px; margin:0 auto; padding:1rem 1rem 6.5rem; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.1rem 1rem; margin-bottom:0.9rem; }
+  h1 { font-size:1.35rem; margin:0 0 0.5rem; line-height:1.25; }
+  h2 { font-size:1.1rem; margin:0 0 0.2rem; }
+  .bloque-letra { display:inline-flex; align-items:center; justify-content:center; width:1.8rem; height:1.8rem; border-radius:50%; background:var(--r800); color:var(--sel-text); font-weight:800; font-size:0.9rem; margin-right:0.45rem; }
+  p { margin:0 0 0.6rem; }
+  .muted { color:var(--muted); font-size:0.9rem; }
+  .progreso { position:sticky; top:0; z-index:5; background:var(--surface-2); padding:0.55rem 0 0.45rem; }
+  .barra { height:8px; background:var(--border); border-radius:99px; overflow:hidden; }
+  .barra > i { display:block; height:100%; background:var(--r800); width:0; transition:width .25s; }
+  .ptxt { font-size:0.8rem; color:var(--muted); margin-top:0.25rem; display:flex; justify-content:space-between; }
+  fieldset { border:0; margin:0 0 1.15rem; padding:0; min-width:0; }
+  fieldset:last-child { margin-bottom:0; }
+  legend { font-weight:700; font-size:1rem; margin-bottom:0.55rem; padding:0; }
+  legend .num { color:var(--r800); margin-right:0.25rem; }
+  legend .opc { font-weight:400; color:var(--muted); font-size:0.85rem; }
+  .q.err legend { color:var(--r700); }
+  .q.err .ops { outline:2px solid var(--r700); outline-offset:4px; border-radius:10px; }
+  .msg-err { color:var(--r700); font-size:0.85rem; font-weight:700; margin-top:0.35rem; display:none; }
+  .q.err .msg-err { display:block; }
+  .ops { display:grid; gap:0.45rem; }
+  .ops.escala { grid-template-columns:repeat(5, 1fr); }
+  .op { position:relative; }
+  .op input { position:absolute; opacity:0; width:1px; height:1px; }
+  .op label { display:flex; align-items:center; gap:0.55rem; min-height:48px; padding:0.6rem 0.75rem; border:1.5px solid var(--border-strong); border-radius:10px; background:var(--surface); cursor:pointer; font-size:0.95rem; user-select:none; }
+  .ops.escala .op label { flex-direction:column; justify-content:center; text-align:center; gap:0.2rem; font-size:0.78rem; padding:0.5rem 0.25rem; min-height:78px; line-height:1.15; }
+  .ops.escala .op label b { font-size:1.15rem; }
+  .op input:checked + label { background:var(--sel); border-color:var(--sel); color:var(--sel-text); font-weight:700; }
+  .op input:focus-visible + label { outline:3px solid var(--focus); outline-offset:2px; }
+  .op label .marca { width:20px; height:20px; border:2px solid currentColor; border-radius:50%; flex-shrink:0; }
+  .op input[type=checkbox] + label .marca { border-radius:5px; }
+  .op input:checked + label .marca { background:var(--sel-text); box-shadow: inset 0 0 0 3px var(--sel); }
+  .na { margin-top:0.45rem; }
+  .sub { margin:0.6rem 0 0 0.25rem; padding-left:0.75rem; border-left:3px solid var(--r300); }
+  input[type=text], input[type=number] { width:100%; font:inherit; font-size:1rem; padding:0.65rem 0.75rem; border:1.5px solid var(--border-strong); border-radius:10px; background:var(--surface); color:var(--text); min-height:48px; }
+  input[type=text]:focus, input[type=number]:focus { outline:3px solid var(--focus); outline-offset:1px; }
+  .min-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; }
+  .min-grid label { display:block; font-size:0.9rem; margin-bottom:0.3rem; }
+  .acciones { position:fixed; left:0; right:0; bottom:0; background:var(--surface); border-top:1px solid var(--border); padding:0.7rem 1rem calc(0.7rem + env(safe-area-inset-bottom)); z-index:10; }
+  .acciones .in { max-width:760px; margin:0 auto; display:flex; gap:0.6rem; }
+  .btn { flex:1; min-height:52px; font:inherit; font-weight:800; font-size:1rem; border-radius:12px; border:2px solid var(--r800); cursor:pointer; }
+  .btn-p { background:var(--r800); color:var(--sel-text); }
+  .btn-s { background:var(--surface); color:var(--r800); flex:0 0 34%; }
+  .btn:disabled { opacity:0.55; cursor:wait; }
+  .btn:focus-visible { outline:3px solid var(--focus); outline-offset:2px; }
+  .centro { text-align:center; padding:2rem 1rem; }
+  .icono { font-size:3rem; line-height:1; margin-bottom:0.6rem; }
+  .aviso { background:var(--r200); border-left:4px solid var(--r800); border-radius:10px; padding:0.75rem 0.85rem; font-size:0.9rem; }
+  .hp { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+  .oculto { display:none !important; }
+  footer { text-align:center; color:var(--muted); font-size:0.75rem; padding:0.5rem 1rem 1rem; }
+  @media (max-width: 560px) {
+    .ops.escala { grid-template-columns:1fr; }
+    .ops.escala .op label { flex-direction:row; justify-content:flex-start; text-align:left; min-height:48px; font-size:0.95rem; padding:0.55rem 0.75rem; gap:0.65rem; }
+    .ops.escala .op label b { font-size:1rem; min-width:1.2rem; text-align:center; }
+    .min-grid { grid-template-columns:1fr; }
+    h1 { font-size:1.2rem; }
+  }
+  @media (min-width: 561px) { .ops.dos { grid-template-columns:1fr 1fr; } }
+  @media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
+</style>
+</head>
+<body>
+<div class="franja"></div>
+<header>
+  <div class="hwrap">
+    <div><div class="hent" id="h-entidad">Encuesta sobre Calidad de Atención</div><div class="hsede" id="h-sede">&nbsp;</div></div>
+    <div class="htools">
+      <button type="button" id="b-letra" aria-pressed="false" title="Aumentar el tamaño de letra" aria-label="Aumentar el tamaño de letra">A+</button>
+      <button type="button" id="b-contraste" aria-pressed="false" title="Alto contraste" aria-label="Alto contraste"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true" style="vertical-align:middle"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 2a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<main id="app" aria-live="polite">
+  <div class="card centro"><div class="icono">⏳</div><p>Cargando la encuesta…</p></div>
+</main>
+
+<div class="acciones oculto" id="barra-acciones">
+  <div class="in">
+    <button type="button" class="btn btn-s" id="b-atras">← Atrás</button>
+    <button type="button" class="btn btn-p" id="b-sig">Siguiente →</button>
+  </div>
+</div>
+<footer>Directiva N.° 003-2024-PCM-SGP · Subsecretaría de Calidad de Servicios · Presidencia del Consejo de Ministros</footer>
+
+<script>
+'use strict';
+// ================================================================
+//  DAC Encuesta v3.36 · Formulario público del cuestionario estándar
+//  de la SGP (versión 3, 26 preguntas). Se abre con ?c=CÓDIGO_DE_SEDE.
+//  ?m=kiosko (tablet en la sede, se reinicia sola) · ?m=asistida (encuestador)
+// ================================================================
+const FN_URL = 'https://ozzeiztfuxjrvdtuybof.supabase.co/functions/v1/encuesta-enviar';
+const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96emVpenRmdXhqcnZkdHV5Ym9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc2MDgxMTEsImV4cCI6MjEwMzE4NDExMX0.xECSxP8lJqhU-p_IRBUceRiNjiCIEIXk_Vh4dh29Cf4';
+
+const ESC = ['Muy insatisfecho', 'Insatisfecho', 'Ni satisfecho ni insatisfecho', 'Satisfecho', 'Muy satisfecho'];
+const ESC_CORTA = ['Muy insatisfecho', 'Insatisfecho', 'Ni satisfecho ni insatisfecho', 'Satisfecho', 'Muy satisfecho'];
+
+// Cuestionario v3: el texto reproduce el formato impreso
+const BLOQUES = [
+  { letra: 'A', titulo: 'Datos de la visita', preguntas: [
+    { n: 2, k: 'gestion', tipo: 'una', txt: '¿Cuál es la gestión principal que vino a realizar hoy?', ops: ['Trámite o solicitud', 'Consulta / orientación', 'Pago', 'Reclamo', 'Otro'], otro: 'gestion_otro', cols: 'dos' },
+    { n: 3, k: 'satisfaccion_general', tipo: 'escala', txt: 'En general, ¿qué tan satisfecho o insatisfecho está con la atención recibida hoy en la entidad?' }
+  ]},
+  { letra: 'B', titulo: 'Trámite, requisitos y resultado', intro: '¿Qué tan satisfecho está con…', preguntas: [
+    { n: 4, k: 'orientacion_recibida', tipo: 'escala', txt: 'La orientación recibida sobre requisitos y pasos de su gestión' },
+    { n: 5, k: 'requisitos_documentos', tipo: 'escala', txt: 'La cantidad de requisitos y documentos solicitados, y la facilidad para obtenerlos' },
+    { n: 6, k: 'facilidades_pago', tipo: 'escala', opcional: true, na: 'No realicé ningún pago', txt: 'Las facilidades y alternativas de pago' },
+    { n: 7, k: 'resultado_gestion', tipo: 'escala', txt: 'El resultado obtenido en la gestión realizada hoy' }
+  ]},
+  { letra: 'C', titulo: 'Trato e información', intro: '¿Qué tan satisfecho está con…', preguntas: [
+    { n: 8, k: 'trato_personal', tipo: 'escala', txt: 'El trato (cortesía, respeto y empatía) del personal que lo atendió' },
+    { n: 9, k: 'interes_personal', tipo: 'escala', txt: 'El interés y la capacidad del personal para resolver sus dudas' },
+    { n: 10, k: 'claridad_info', tipo: 'escala', txt: 'La claridad y utilidad de la información recibida' },
+    { n: 11, k: 'discriminacion', tipo: 'una', txt: '¿Considera que fue tratado de manera discriminatoria en algún momento de su visita?', ops: ['Sí', 'No'], cols: 'dos' }
+  ]},
+  { letra: 'D', titulo: 'Tiempos', intro: '¿Qué tan satisfecho está con…', preguntas: [
+    { n: 12, k: 'tiempo_espera_pct', tipo: 'escala', txt: 'El tiempo de espera hasta ser atendido' },
+    { n: 13, k: 'tiempo_atencion_pct', tipo: 'escala', txt: 'El tiempo que duró su atención en el módulo o ventanilla' },
+    { n: 14, k: 'cantidad_visitas', tipo: 'escala', txt: 'La cantidad de visitas que ha necesitado para completar su gestión' },
+    { n: 15, k: 'minutos', tipo: 'minutos', opcional: true, txt: 'Aproximadamente, ¿cuántos minutos esperó hasta ser atendido y cuántos minutos duró la atención?' }
+  ]},
+  { letra: 'E', titulo: 'Accesibilidad y ambiente', intro: '¿Qué tan satisfecho está con…', preguntas: [
+    { n: 16, k: 'atencion_preferente', tipo: 'escala', txt: 'La atención preferente para adultos mayores, gestantes, personas con discapacidad y personas con niños' },
+    { n: 17, k: 'horario_atencion', tipo: 'escala', txt: 'El horario de atención y su cumplimiento' },
+    { n: 18, k: 'senalizacion', tipo: 'escala', txt: 'La señalización, el orden de los turnos y la facilidad para ubicarse en el local' },
+    { n: 19, k: 'comodidad_instalaciones', tipo: 'escala', txt: 'La comodidad, limpieza y estado de la zona de espera y de las instalaciones' }
+  ]},
+  { letra: 'F', titulo: 'Reclamos, canales y recomendaciones', preguntas: [
+    { n: 20, k: 'reclamo', tipo: 'condicional', txt: '¿Ha presentado un reclamo ante esta entidad en los últimos doce meses?', no: 'No he presentado reclamo', si: 'Sí, he presentado un reclamo', subtxt: '¿Qué tan satisfecho está con la respuesta recibida?' },
+    { n: 21, k: 'tramite_internet', tipo: 'condicional', txt: '¿Ha realizado trámites con esta entidad por internet o por teléfono?', no: 'No he usado esos canales', si: 'Sí, los he usado', subtxt: '¿Qué tan satisfecho está con la facilidad de ese canal?' },
+    { n: 22, k: 'recomendaciones', tipo: 'varias', opcional: true, txt: '¿Qué recomendaría a la entidad para mejorar la atención?', nota: 'Puede marcar más de una', ops: ['Reducir el tiempo de espera', 'Mejorar la orientación', 'Simplificar requisitos', 'Ampliar el horario', 'Mejorar las instalaciones', 'Habilitar trámites por internet', 'Otro'], otro: 'recomendaciones_otro', cols: 'dos' }
+  ]},
+  { letra: 'G', titulo: 'Datos de la persona encuestada', preguntas: [
+    { n: 23, k: 'genero', tipo: 'una', txt: 'Sexo', ops: ['Femenino', 'Masculino', 'No precisa'] },
+    { n: 24, k: 'edad', tipo: 'una', txt: 'Edad', ops: ['18 a 29', '30 a 44', '45 a 60', 'Más de 60'], cols: 'dos' },
+    { n: 25, k: 'educacion', tipo: 'una', txt: 'Último grado de instrucción', ops: ['Sin estudios / primaria', 'Secundaria', 'Técnica', 'Universitaria', 'Posgrado'], cols: 'dos' },
+    { n: 26, k: 'condiciones', tipo: 'varias', excl: 'Ninguna', txt: '¿Se encuentra en alguna de estas condiciones?', nota: 'Puede marcar más de una', ops: ['Lengua materna originaria (quechua, aimara, amazónica)', 'Persona con discapacidad', 'Gestante', 'Adulto mayor', 'Ninguna'] }
+  ]}
+];
+
+const P = new URLSearchParams(location.search);
+const CODIGO = (P.get('c') || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+const MODO = ['kiosko', 'asistida'].includes(P.get('m')) ? P.get('m') : (P.get('src') === 'enlace' ? 'enlace' : 'qr');
+const app = document.getElementById('app');
+const barra = document.getElementById('barra-acciones');
+const bSig = document.getElementById('b-sig'), bAtras = document.getElementById('b-atras');
+let info = null, paso = -1, r = {}, inicio = 0;
+
+function ls(k, v) { try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) { return null; } }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function dispositivo() {
+  let d = ls('dac_enc_dev');
+  if (!d) { d = 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10); ls('dac_enc_dev', d); }
+  return d;
+}
+async function llamar(body) {
+  const res = await fetch(FN_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + ANON, 'apikey': ANON }, body: JSON.stringify(body) });
+  let j = null; try { j = await res.json(); } catch (e) { /* respuesta vacía */ }
+  return j || { ok: false, error: 'Respuesta no válida del servidor (' + res.status + ').' };
+}
+
+// ---- Accesibilidad ----
+function prefs() {
+  const html = document.documentElement;
+  html.classList.toggle('letra-grande', ls('dac_enc_letra') === '1');
+  html.classList.toggle('alto-contraste', ls('dac_enc_contraste') === '1');
+  document.getElementById('b-letra').setAttribute('aria-pressed', ls('dac_enc_letra') === '1');
+  document.getElementById('b-contraste').setAttribute('aria-pressed', ls('dac_enc_contraste') === '1');
+}
+document.getElementById('b-letra').onclick = () => { ls('dac_enc_letra', ls('dac_enc_letra') === '1' ? '0' : '1'); prefs(); };
+document.getElementById('b-contraste').onclick = () => { ls('dac_enc_contraste', ls('dac_enc_contraste') === '1' ? '0' : '1'); prefs(); };
+prefs();
+
+// ---- Pantallas ----
+function pantallaMensaje(icono, titulo, texto, boton) {
+  barra.classList.add('oculto');
+  app.innerHTML = '<div class="card centro"><div class="icono" aria-hidden="true">' + icono + '</div><h1>' + esc(titulo) + '</h1><p class="muted">' + texto + '</p>' +
+    (boton ? '<button type="button" class="btn btn-p" style="max-width:320px;margin-top:0.75rem" id="b-msg">' + esc(boton.t) + '</button>' : '') + '</div>';
+  if (boton) document.getElementById('b-msg').onclick = boton.f;
+  window.scrollTo(0, 0);
+}
+
+function pantallaInicio() {
+  paso = -1;
+  barra.classList.add('oculto');
+  app.innerHTML =
+    '<div class="card">' +
+      '<h1>Encuesta sobre Calidad de Atención al Ciudadano</h1>' +
+      '<p><strong>' + esc(info.entidad) + '</strong> está midiendo la calidad de la atención que brinda a la ciudadanía en <strong>' + esc(info.sede) + '</strong>.</p>' +
+      '<p>Sus respuestas son <strong>anónimas y voluntarias</strong>: no le pediremos nombre, DNI, teléfono ni correo. Le tomará alrededor de tres minutos. Responda pensando en su visita de hoy.</p>' +
+      (MODO === 'asistida' ? '<div class="aviso">Modo encuestador: lea cada pregunta en voz alta y marque la respuesta que indique la persona.</div>' : '') +
+      '<button type="button" class="btn btn-p" id="b-empezar" style="width:100%;margin-top:0.9rem">Empezar la encuesta</button>' +
+    '</div>';
+  document.getElementById('b-empezar').onclick = () => { r = {}; inicio = Date.now(); irPaso(0); };
+  window.scrollTo(0, 0);
+}
+
+function htmlOps(q, nombre, ops, tipoInput, clase) {
+  return '<div class="ops ' + (clase || '') + '">' + ops.map((o, i) => {
+    const id = nombre + '_' + i;
+    const val = typeof o === 'object' ? o.v : o, lab = typeof o === 'object' ? o.l : '<span class="marca" aria-hidden="true"></span>' + esc(o);
+    return '<div class="op"><input type="' + tipoInput + '" name="' + nombre + '" id="' + id + '" value="' + esc(val) + '"><label for="' + id + '">' + lab + '</label></div>';
+  }).join('') + '</div>';
+}
+function opsEscala(nombre) {
+  return htmlOps(null, nombre, ESC.map((v, i) => ({ v: v, l: '<b>' + (i + 1) + '</b><span>' + ESC_CORTA[i] + '</span>' })), 'radio', 'escala');
+}
+
+function htmlPregunta(q) {
+  const opc = q.opcional ? ' <span class="opc">(opcional)</span>' : '';
+  const nota = q.nota ? ' <span class="opc">(' + esc(q.nota) + ')</span>' : '';
+  let cuerpo = '';
+  if (q.tipo === 'escala') {
+    cuerpo = opsEscala(q.k);
+    if (q.na) cuerpo += '<div class="na">' + htmlOps(q, q.k + '__na', [q.na], 'checkbox') + '</div>';
+  } else if (q.tipo === 'una') {
+    cuerpo = htmlOps(q, q.k, q.ops, 'radio', q.cols);
+    if (q.otro) cuerpo += '<div class="sub oculto" id="sub-' + q.k + '"><input type="text" maxlength="120" id="t-' + q.otro + '" placeholder="Indique cuál" aria-label="Indique cuál"></div>';
+  } else if (q.tipo === 'varias') {
+    cuerpo = htmlOps(q, q.k, q.ops, 'checkbox', q.cols);
+    if (q.otro) cuerpo += '<div class="sub oculto" id="sub-' + q.k + '"><input type="text" maxlength="200" id="t-' + q.otro + '" placeholder="¿Qué otra recomendación?" aria-label="Otra recomendación"></div>';
+  } else if (q.tipo === 'condicional') {
+    cuerpo = htmlOps(q, q.k + '__sn', [q.no, q.si], 'radio', 'dos') +
+      '<div class="sub oculto" id="sub-' + q.k + '"><p style="font-weight:700;margin:0.2rem 0 0.5rem">' + esc(q.subtxt) + '</p>' + opsEscala(q.k + '__esc') + '</div>';
+  } else if (q.tipo === 'minutos') {
+    cuerpo = '<div class="min-grid"><div><label for="t-espera">Minutos de espera</label><input type="number" inputmode="numeric" min="0" max="600" step="1" id="t-espera" placeholder="Ej.: 15"></div>' +
+             '<div><label for="t-atencion">Minutos que duró la atención</label><input type="number" inputmode="numeric" min="0" max="600" step="1" id="t-atencion" placeholder="Ej.: 10"></div></div>';
+  }
+  return '<fieldset class="q" id="q-' + q.k + '"><legend><span class="num">' + q.n + '.</span>' + esc(q.txt) + opc + nota + '</legend>' + cuerpo +
+         '<div class="msg-err" role="alert">Responda esta pregunta para continuar.</div></fieldset>';
+}
+
+function irPaso(i) {
+  paso = i;
+  const b = BLOQUES[i];
+  const pct = Math.round(100 * i / BLOQUES.length);
+  app.innerHTML =
+    '<div class="progreso"><div class="barra" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + pct + '" aria-label="Avance de la encuesta"><i style="width:' + pct + '%"></i></div>' +
+    '<div class="ptxt"><span>Parte ' + (i + 1) + ' de ' + BLOQUES.length + '</span><span>' + pct + ' %</span></div></div>' +
+    '<form class="card" id="f" novalidate autocomplete="off">' +
+      '<h2><span class="bloque-letra" aria-hidden="true">' + b.letra + '</span>' + esc(b.titulo) + '</h2>' +
+      (b.intro ? '<p class="muted" style="margin:0.35rem 0 0.9rem">' + esc(b.intro) + '</p>' : '<div style="height:0.6rem"></div>') +
+      b.preguntas.map(htmlPregunta).join('') +
+      (i === BLOQUES.length - 1 ? '<div class="hp" aria-hidden="true"><label>No llenar<input type="text" id="hp" tabindex="-1" autocomplete="off"></label></div>' : '') +
+    '</form>';
+  barra.classList.remove('oculto');
+  bAtras.textContent = i === 0 ? '← Inicio' : '← Atrás';
+  bSig.textContent = i === BLOQUES.length - 1 ? 'Enviar respuestas ✓' : 'Siguiente →';
+  restaurar(b);
+  enlazar(b);
+  window.scrollTo(0, 0);
+  const h = app.querySelector('h2'); if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+}
+
+function marcados(nombre) { return Array.from(app.querySelectorAll('input[name="' + nombre + '"]:checked')).map(x => x.value); }
+function marcar(nombre, valores) { valores = [].concat(valores); app.querySelectorAll('input[name="' + nombre + '"]').forEach(x => { x.checked = valores.includes(x.value); }); }
+
+function enlazar(b) {
+  b.preguntas.forEach(q => {
+    const fs = document.getElementById('q-' + q.k);
+    fs.addEventListener('change', () => fs.classList.remove('err'));
+    if (q.otro) {
+      fs.addEventListener('change', () => { document.getElementById('sub-' + q.k).classList.toggle('oculto', !marcados(q.k).includes('Otro')); });
+    }
+    if (q.tipo === 'condicional') {
+      fs.addEventListener('change', () => { document.getElementById('sub-' + q.k).classList.toggle('oculto', marcados(q.k + '__sn')[0] !== q.si); });
+    }
+    if (q.excl) {
+      fs.addEventListener('change', ev => {
+        const t = ev.target; if (!t || t.name !== q.k || !t.checked) return;
+        if (t.value === q.excl) marcar(q.k, [q.excl]);
+        else marcar(q.k, marcados(q.k).filter(v => v !== q.excl));
+      });
+    }
+    if (q.na) {
+      fs.addEventListener('change', ev => {
+        const t = ev.target; if (!t) return;
+        if (t.name === q.k + '__na' && t.checked) marcar(q.k, []);
+        if (t.name === q.k && t.checked) marcar(q.k + '__na', []);
+      });
+    }
+  });
+}
+
+function restaurar(b) {
+  b.preguntas.forEach(q => {
+    const v = r[q.k];
+    if (q.tipo === 'escala') { if (v) marcar(q.k, v); else if (q.na && r[q.k + '__na']) marcar(q.k + '__na', [q.na]); }
+    else if (q.tipo === 'una' || q.tipo === 'varias') {
+      if (v) marcar(q.k, v);
+      if (q.otro && (v === 'Otro' || (Array.isArray(v) && v.includes('Otro')))) { document.getElementById('sub-' + q.k).classList.remove('oculto'); document.getElementById('t-' + q.otro).value = r[q.otro] || ''; }
+    } else if (q.tipo === 'condicional' && v) {
+      if (v === q.no) marcar(q.k + '__sn', q.no);
+      else { marcar(q.k + '__sn', q.si); document.getElementById('sub-' + q.k).classList.remove('oculto'); marcar(q.k + '__esc', v); }
+    } else if (q.tipo === 'minutos') {
+      if (r.tiempo_espera_min != null) document.getElementById('t-espera').value = r.tiempo_espera_min;
+      if (r.tiempo_atencion_min != null) document.getElementById('t-atencion').value = r.tiempo_atencion_min;
+    }
+  });
+}
+
+// Lee el bloque actual en r; devuelve la primera pregunta incompleta
+function leerYValidar(b) {
+  let primera = null;
+  const falla = q => { document.getElementById('q-' + q.k).classList.add('err'); if (!primera) primera = q; };
+  b.preguntas.forEach(q => {
+    document.getElementById('q-' + q.k).classList.remove('err');
+    if (q.tipo === 'escala') {
+      const v = marcados(q.k)[0] || null;
+      r[q.k] = v; if (q.na) r[q.k + '__na'] = marcados(q.k + '__na').length > 0;
+      if (!v && !q.opcional) falla(q);
+    } else if (q.tipo === 'una') {
+      const v = marcados(q.k)[0] || null; r[q.k] = v;
+      if (q.otro) r[q.otro] = v === 'Otro' ? document.getElementById('t-' + q.otro).value.trim() : '';
+      if (!v) falla(q);
+    } else if (q.tipo === 'varias') {
+      const v = marcados(q.k); r[q.k] = v;
+      if (q.otro) r[q.otro] = v.includes('Otro') ? document.getElementById('t-' + q.otro).value.trim() : '';
+      if (!v.length && !q.opcional) falla(q);
+    } else if (q.tipo === 'condicional') {
+      const sn = marcados(q.k + '__sn')[0];
+      if (sn === q.no) r[q.k] = q.no;
+      else if (sn === q.si) { const v = marcados(q.k + '__esc')[0]; r[q.k] = v || null; if (!v) falla(q); }
+      else { r[q.k] = null; falla(q); }
+    } else if (q.tipo === 'minutos') {
+      const num = id => { const x = document.getElementById(id).value.trim(); if (x === '') return null; const n = Math.round(Number(x)); return (isFinite(n) && n >= 0 && n <= 600) ? n : NaN; };
+      const a = num('t-espera'), d = num('t-atencion');
+      if (Number.isNaN(a) || Number.isNaN(d)) { falla(q); document.querySelector('#q-minutos .msg-err').textContent = 'Indique un número de minutos entre 0 y 600, o deje el campo vacío.'; }
+      r.tiempo_espera_min = Number.isNaN(a) ? null : a; r.tiempo_atencion_min = Number.isNaN(d) ? null : d;
+    }
+  });
+  return primera;
+}
+
+bAtras.onclick = () => {
+  if (paso < 0) return;
+  leerYValidar(BLOQUES[paso]);
+  if (paso === 0) pantallaInicio(); else irPaso(paso - 1);
+};
+bSig.onclick = async () => {
+  const b = BLOQUES[paso];
+  const falta = leerYValidar(b);
+  if (falta) { const el = document.getElementById('q-' + falta.k); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); const inp = el.querySelector('input'); if (inp) inp.focus({ preventScroll: true }); return; }
+  if (paso < BLOQUES.length - 1) { irPaso(paso + 1); return; }
+  await enviar();
+};
+
+function armarRespuestas() {
+  const out = {};
+  BLOQUES.forEach(b => b.preguntas.forEach(q => {
+    if (q.tipo === 'minutos') return;
+    out[q.k] = r[q.k] == null ? (q.tipo === 'varias' ? [] : null) : r[q.k];
+    if (q.otro) out[q.otro] = r[q.otro] || '';
+  }));
+  out.tiempo_espera_min = r.tiempo_espera_min; out.tiempo_atencion_min = r.tiempo_atencion_min;
+  return out;
+}
+
+async function enviar() {
+  const hp = document.getElementById('hp');
+  const carga = { accion: 'enviar', c: CODIGO, r: armarRespuestas(), d: dispositivo(), t: Math.round((Date.now() - inicio) / 1000), canal: MODO, hp: hp ? hp.value : '' };
+  bSig.disabled = true; bAtras.disabled = true; bSig.textContent = 'Enviando…';
+  let res;
+  try { res = await llamar(carga); }
+  catch (e) { res = { ok: false, red: true }; }
+  bSig.disabled = false; bAtras.disabled = false; bSig.textContent = 'Enviar respuestas ✓';
+  if (res.ok) { gracias(); return; }
+  if (res.red) {
+    // Sin conexión: se guarda en el dispositivo y se reintenta al volver la conexión
+    const cola = JSON.parse(ls('dac_enc_cola') || '[]'); cola.push(carga); ls('dac_enc_cola', JSON.stringify(cola));
+    gracias(true); return;
+  }
+  if (res.codigo === 'repetida') { pantallaMensaje('✅', 'Gracias, ya registramos su respuesta', esc(res.error || '')); return; }
+  if (res.codigo === 'cerrada' || res.codigo === 'pausada') { pantallaMensaje('⏸️', 'La encuesta no está recibiendo respuestas', esc(res.error || '')); return; }
+  alert(res.error || 'No se pudo enviar la encuesta. Intente nuevamente.');
+}
+
+async function vaciarCola() {
+  let cola; try { cola = JSON.parse(ls('dac_enc_cola') || '[]'); } catch (e) { cola = []; }
+  if (!cola.length || !navigator.onLine) return;
+  const quedan = [];
+  for (const c of cola) {
+    try { const res = await llamar(c); if (!res.ok && !['repetida', 'invalida', 'cerrada', 'muy_rapido', 'no_encontrada'].includes(res.codigo)) quedan.push(c); }
+    catch (e) { quedan.push(c); }
+  }
+  ls('dac_enc_cola', quedan.length ? JSON.stringify(quedan) : null);
+}
+window.addEventListener('online', vaciarCola);
+
+function gracias(pendiente) {
+  r = {};
+  const extra = pendiente ? '<br><br><span class="aviso" style="display:inline-block">Sin conexión en este momento: la respuesta quedó guardada en este equipo y se enviará sola al recuperar internet.</span>' : '';
+  if (MODO === 'kiosko' || MODO === 'asistida') {
+    let s = 8;
+    pantallaMensaje('🙌', '¡Muchas gracias por su tiempo!', 'Sus respuestas permiten mejorar la atención que brinda la entidad.' + extra +
+      '<br><br><span id="cuenta">La encuesta se reinicia en ' + s + ' segundos.</span>', { t: 'Nueva encuesta', f: () => { clearInterval(tmr); pantallaInicio(); } });
+    const tmr = setInterval(() => { s--; const el = document.getElementById('cuenta'); if (el) el.textContent = 'La encuesta se reinicia en ' + s + ' segundos.'; if (s <= 0) { clearInterval(tmr); pantallaInicio(); } }, 1000);
+  } else {
+    pantallaMensaje('🙌', '¡Muchas gracias por su tiempo!', 'Sus respuestas permiten mejorar la atención que brinda <strong>' + esc(info.entidad) + '</strong>.' + extra + '<br><br>Ya puede cerrar esta página.');
+  }
+}
+
+window.addEventListener('beforeunload', ev => { if (paso >= 0 && Object.keys(r).length) { ev.preventDefault(); ev.returnValue = ''; } });
+
+(async function iniciar() {
+  if (!CODIGO) { pantallaMensaje('🔎', 'Enlace incompleto', 'Abra la encuesta desde el código QR o el enlace que le entregó la entidad.'); return; }
+  try { info = await llamar({ accion: 'info', c: CODIGO }); }
+  catch (e) { pantallaMensaje('📶', 'Sin conexión', 'No se pudo cargar la encuesta. Verifique su conexión a internet e intente de nuevo.', { t: 'Reintentar', f: () => location.reload() }); return; }
+  if (!info || !info.ok) { pantallaMensaje('🔎', 'Encuesta no encontrada', esc((info && info.error) || 'Verifique el enlace o el código QR.')); return; }
+  document.getElementById('h-entidad').textContent = info.entidad;
+  document.getElementById('h-sede').textContent = info.sede + (MODO === 'kiosko' ? ' · tablet de la sede' : (MODO === 'asistida' ? ' · encuestador' : ''));
+  document.title = 'Encuesta · ' + info.entidad;
+  if (info.estado !== 'abierta') {
+    pantallaMensaje('⏸️', info.estado === 'pausada' ? 'Encuesta pausada' : 'Encuesta cerrada', info.estado === 'pausada' ? 'La entidad pausó temporalmente esta encuesta. Intente más tarde.' : 'Esta encuesta ya no recibe respuestas. Gracias por su interés.');
+    return;
+  }
+  vaciarCola();
+  pantallaInicio();
+})();
+</script>
+</body>
+</html>
